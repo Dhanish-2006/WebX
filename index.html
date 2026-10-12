@@ -1,0 +1,1150 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dhanish — Full Stack Developer</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #20343a;
+  --glass: rgba(255,255,255,.12);
+  --line: rgba(255,255,255,.25);
+  --ease: cubic-bezier(.22,1,.36,1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html {
+  min-height: 100%;
+  background: var(--bg);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--bg);
+  font-family: Inter, sans-serif;
+  color: white;
+  cursor: none;
+}
+
+a, button {
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, a {
+  font: inherit;
+}
+
+#scene {
+  position: fixed;
+  inset: -2%;
+  width: 104%;
+  height: 104%;
+  z-index: 0;
+  will-change: transform;
+  pointer-events: none;
+}
+
+#c {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(to top right,
+      rgba(0,0,0,.60),
+      rgba(0,0,0,.23) 40%,
+      transparent 70%),
+    linear-gradient(to bottom,
+      rgba(0,0,0,.12),
+      transparent 25%);
+}
+
+nav {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 3vw, 30px);
+  padding: 13px clamp(17px, 2vw, 28px);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,255,255,.13);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  z-index: 10;
+  white-space: nowrap;
+}
+
+nav a {
+  position: relative;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .15em;
+  opacity: .85;
+  transition: opacity .25s;
+}
+
+nav a:hover,
+nav a.active {
+  opacity: 1;
+}
+
+nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: -5px;
+  height: 1px;
+  background: white;
+  transition: right .3s var(--ease);
+}
+
+nav a:hover::after,
+nav a.active::after {
+  right: 0;
+}
+
+.hero {
+  position: fixed;
+  left: clamp(20px,5vw,72px);
+  bottom: clamp(24px,6vh,64px);
+  z-index: 5;
+  max-width: 365px;
+  transform: translate3d(0,0,0);
+  transition:
+    opacity .5s var(--ease),
+    transform .7s var(--ease),
+    filter .5s;
+}
+
+.hero.leaving {
+  opacity: 0;
+  transform: translate3d(-35px,15px,0);
+  filter: blur(7px);
+  pointer-events: none;
+}
+
+.hi {
+  font-weight: 400;
+  letter-spacing: .3em;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.name {
+  font-family: "Dancing Script", cursive;
+  font-size: clamp(65px,9vw,120px);
+  line-height: 1.05;
+  margin: 6px 0 14px;
+  text-shadow: 0 8px 30px rgba(0,0,0,.25);
+}
+
+.bio {
+  max-width: 350px;
+  font-size: 14px;
+  line-height: 1.7;
+  font-weight: 300;
+  opacity: .94;
+}
+
+.btns {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  --mx: 0px;
+  --my: 0px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 13px 23px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  overflow: hidden;
+  transform: translate3d(var(--mx),var(--my),0);
+  transition:
+    transform .3s var(--ease),
+    box-shadow .3s,
+    background .3s;
+  will-change: transform;
+}
+
+.btn:hover {
+  box-shadow: 0 8px 30px rgba(0,0,0,.15);
+}
+
+.solid {
+  background: white;
+  color: #111;
+}
+
+.solid:hover {
+  background: #e8f5f2;
+}
+
+.glass {
+  border: 1px solid rgba(255,255,255,.65);
+  color: white;
+  background: rgba(255,255,255,.12);
+  backdrop-filter: blur(12px);
+}
+
+#loading {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 50;
+  background: var(--bg);
+  font-size: 12px;
+  letter-spacing: .3em;
+  transition: opacity .7s;
+  pointer-events: none;
+}
+
+#loading.error {
+  pointer-events: auto;
+  padding: 25px;
+  text-align: center;
+  line-height: 2;
+}
+
+/* GLOWING CUSTOM CURSOR */
+
+#dot, #ring, .trail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+#dot {
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  background: #fff;
+  box-shadow:
+    0 0 10px 3px rgba(255,255,255,.8),
+    0 0 28px rgba(150,230,255,.7);
+}
+
+#ring {
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+  border: 1px solid rgba(255,255,255,.7);
+  background: rgba(255,255,255,0);
+  transition:
+    width .3s var(--ease),
+    height .3s var(--ease),
+    margin .3s var(--ease),
+    background .3s,
+    border-color .3s;
+}
+
+#ring.hover {
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  background: rgba(255,255,255,.10);
+  border-color: white;
+}
+
+.trail {
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  background: rgba(210,245,255,.85);
+  box-shadow: 0 0 12px rgba(180,230,255,.8);
+  opacity: 0;
+}
+
+/* CINEMATIC CONTENT PANELS */
+
+.panel {
+  position: fixed;
+  inset: 0;
+  z-index: 7;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  padding: 100px 24px 35px;
+  background: rgba(9,22,25,.28);
+  backdrop-filter: blur(0);
+  -webkit-backdrop-filter: blur(0);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity .45s,
+    visibility .45s,
+    backdrop-filter .5s;
+}
+
+.panel.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.panel-card {
+  width: min(880px,100%);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: clamp(24px,5vw,48px);
+  border: 1px solid rgba(255,255,255,.23);
+  border-radius: 25px;
+  background: rgba(22,43,47,.88);
+  box-shadow: 0 30px 100px rgba(0,0,0,.28);
+  transform: translateY(30px) scale(.98);
+  filter: blur(5px);
+  transition:
+    transform .65s var(--ease),
+    filter .5s,
+    opacity .5s;
+  opacity: 0;
+}
+
+.panel.open .panel-card {
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+  opacity: 1;
+}
+
+.panel-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 26px;
+}
+
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: .24em;
+  opacity: .7;
+  text-transform: uppercase;
+}
+
+.panel h2 {
+  margin-top: 9px;
+  font-size: clamp(30px,5vw,50px);
+  font-weight: 400;
+  letter-spacing: -.04em;
+}
+
+.close-btn {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--glass);
+  color: white;
+  cursor: pointer;
+  transition: transform .3s, background .3s;
+}
+
+.close-btn:hover {
+  transform: rotate(90deg);
+  background: rgba(255,255,255,.24);
+}
+
+.panel-copy {
+  max-width: 650px;
+  color: rgba(255,255,255,.82);
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.skill {
+  padding: 9px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  font-size: 11px;
+}
+
+/* INTERACTIVE PROJECT PREVIEWS */
+
+.projects {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 15px;
+}
+
+.project {
+  --px: 0deg;
+  --py: 0deg;
+  position: relative;
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,.19);
+  border-radius: 18px;
+  text-decoration: none;
+  overflow: hidden;
+  background: linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.035));
+  transform: perspective(800px) rotateX(var(--px)) rotateY(var(--py));
+  transition:
+    transform .25s ease,
+    border-color .3s,
+    background .3s;
+  transform-style: preserve-3d;
+}
+
+.project::before {
+  content: "";
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  top: -55px;
+  right: -55px;
+  border-radius: 50%;
+  background: var(--glow,rgba(255,255,255,.16));
+  filter: blur(28px);
+  transition: transform .4s;
+}
+
+.project:hover {
+  border-color: rgba(255,255,255,.5);
+  background: rgba(255,255,255,.12);
+}
+
+.project:hover::before {
+  transform: scale(1.5);
+}
+
+.project > * {
+  position: relative;
+  z-index: 1;
+}
+
+.project-number {
+  font-size: 10px;
+  letter-spacing: .2em;
+  opacity: .6;
+}
+
+.project h3 {
+  margin: 30px 0 8px;
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.project p {
+  font-size: 12px;
+  line-height: 1.6;
+  opacity: .72;
+}
+
+.project-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  font-size: 11px;
+}
+
+.project-bottom span:last-child {
+  font-size: 20px;
+  transition: transform .3s;
+}
+
+.project:hover .project-bottom span:last-child {
+  transform: translate(4px,-4px);
+}
+
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.contact-links a {
+  padding: 12px 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 12px;
+  transition: background .25s;
+}
+
+.contact-links a:hover {
+  background: rgba(255,255,255,.14);
+}
+
+#toast {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translate(-50%,20px);
+  z-index: 200;
+  padding: 12px 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(20,35,38,.95);
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s, transform .3s;
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translate(-50%,0);
+}
+
+@media (max-width: 650px) {
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  nav {
+    top: 14px;
+    gap: 14px;
+    padding: 12px 16px;
+    max-width: calc(100vw - 20px);
+  }
+
+  nav a {
+    font-size: 9px;
+    letter-spacing: .1em;
+  }
+
+  .hero {
+    left: 23px;
+    right: 23px;
+    bottom: 32px;
+    max-width: 360px;
+  }
+
+  .name {
+    font-size: clamp(65px,17vw,100px);
+  }
+
+  .bio {
+    font-size: 13px;
+  }
+
+  .panel {
+    padding: 85px 13px 18px;
+  }
+
+  .panel-card {
+    padding: 23px 18px;
+    border-radius: 19px;
+  }
+
+  .projects {
+    grid-template-columns: 1fr;
+  }
+
+  .project {
+    min-height: 165px;
+  }
+
+  #scene {
+    inset: -1%;
+    width: 102%;
+    height: 102%;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  body {
+    cursor: auto;
+  }
+
+  #dot, #ring, .trail {
+    display: none;
+  }
+
+  .btn, .project {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="scene">
+  <canvas id="c"></canvas>
+</div>
+<div class="scrim"></div>
+
+<div id="loading">LOADING EXPERIENCE…</div>
+
+<nav aria-label="Main navigation">
+  <a href="#work" data-panel="work">[WORK]</a>
+  <a href="#about" data-panel="about">[ABOUT]</a>
+  <a href="#contact" data-panel="contact">[CONTACT]</a>
+</nav>
+
+<section class="hero" id="hero">
+  <div class="hi">Hi, I'm</div>
+  <h1 class="name">Dhanish</h1>
+  <p class="bio">
+    I design and build websites people enjoy using.
+    From the first sketch to the final deploy, I care
+    about the details.
+  </p>
+
+ 
+<div class="btns">
+  <a class="btn glass magnetic" href="#contact" data-panel="contact">
+    Let's Talk
+  </a>
+
+  <a class="btn solid magnetic" href="#about" data-panel="about">
+    Info <span>↗</span>
+  </a>
+</div>
+
+</section>
+
+<!-- WORK PANEL -->
+<section class="panel" id="work" aria-hidden="true">
+  <div class="panel-card">
+    <div class="panel-top">
+      <div>
+        <div class="eyebrow">Selected creations / 01—03</div>
+        <h2>Things I've built.</h2>
+      </div>
+      <button class="close-btn" aria-label="Close panel">✕</button>
+    </div>
+
+    <div class="projects">
+      
+      <a class="project" href="https://dhanish-2006.github.io/GameX/" target="_blank" rel="noopener noreferrer" style="--glow:rgba(63,170,255,.35)">
+
+        <div class="project-number">PROJECT / 01</div>
+        <div>
+          <h3>GameX</h3>
+          <p>A gaming hub for browser games and interactive experiences.</p>
+        </div>
+        <div class="project-bottom">
+          <span>Gaming platform</span><span>↗</span>
+        </div>
+      </a>
+
+      
+      <a class="project" href="https://dhanish-2006.github.io/ListenX/" target="_blank" rel="noopener noreferrer" style="--glow:rgba(180,100,255,.35)">
+
+        <div class="project-number">PROJECT / 02</div>
+        <div>
+          <h3>ListenX</h3>
+          <p>A music player with playlists, favourites and playback controls.</p>
+        </div>
+        <div class="project-bottom">
+          <span>Music experience</span><span>↗</span>
+        </div>
+      </a>
+
+      
+       <a class="project" href="https://dhanish-2006.github.io/ChatX/" target="_blank" rel="noopener noreferrer" style="--glow:rgba(80,255,190,.27)">
+
+        <div class="project-number">PROJECT / 03</div>
+        <div>
+          <h3>ChatX</h3>
+          <p>An AI chat interface with conversation history and messaging.</p>
+        </div>
+        <div class="project-bottom">
+          <span>AI application</span><span>↗</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT PANEL -->
+<section class="panel" id="about" aria-hidden="true">
+  <div class="panel-card">
+    <div class="panel-top">
+      <div>
+        <div class="eyebrow">A little about me</div>
+        <h2>Design meets code.</h2>
+      </div>
+      <button class="close-btn" aria-label="Close panel">✕</button>
+    </div>
+
+    <p class="panel-copy">
+      I'm Dhanish, a developer who enjoys turning ideas into
+      useful, engaging web experiences. I work on interfaces,
+      interactive features and projects that combine thoughtful
+      design with practical functionality.
+      <br><br>
+      I believe a great website should not only look good —
+      it should feel good to use.
+    </p>
+
+    <div class="skills">
+      <span class="skill">HTML</span>
+      <span class="skill">CSS</span>
+      <span class="skill">JavaScript</span>
+      <span class="skill">Python</span>
+      <span class="skill">UI Design</span>
+      <span class="skill">Interactive Web</span>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT PANEL -->
+<section class="panel" id="contact" aria-hidden="true">
+  <div class="panel-card">
+    <div class="panel-top">
+      <div>
+        <div class="eyebrow">Have something in mind?</div>
+        <h2>Let's make it happen.</h2>
+      </div>
+      <button class="close-btn" aria-label="Close panel">✕</button>
+    </div>
+
+    <p class="panel-copy">
+      Have an idea for a website or want to work together?
+      Get in touch using one of the links below.
+    </p>
+
+    <div class="contact-links">
+      <a href="mailto:YOUR_EMAIL@example.com">Email me ↗</a>
+      <a href="YOUR_GITHUB_URL" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      <a href="YOUR_LINKEDIN_URL" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+    </div>
+  </div>
+</section>
+
+<div id="ring"></div>
+<div id="dot"></div>
+<div id="toast" role="status"></div>
+
+<script>
+// ======================================================
+// 1. CHARACTER FRAME ANIMATION — ORIGINAL SYSTEM PRESERVED
+// ======================================================
+
+const FRAME_COUNT = 64;
+const FRAME_DIR = 'public/frames/';
+const FACE = { x: 0.51, y: 0.5 };
+const DEADZONE = 0.02;
+const LERP = 0.26;
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const scene = document.getElementById('scene');
+const pad = n => String(n).padStart(2, '0');
+
+const frames = [];
+let center = null;
+let ready = false;
+let angle = 0;
+
+function loadImage(src) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+async function init() {
+  const list = Array.from(
+    { length: FRAME_COUNT },
+    (_, i) => loadImage(`${FRAME_DIR}frame_${pad(i)}.webp`)
+  );
+
+  center = await loadImage(FRAME_DIR + 'center.webp');
+  const loaded = await Promise.all(list);
+  loaded.forEach(frame => frames.push(frame));
+
+  if (!center || frames.some(frame => !frame)) {
+    const loading = document.getElementById('loading');
+    loading.classList.add('error');
+    loading.innerHTML =
+      'CHARACTER FRAMES NOT FOUND<br>' +
+      'Check public/frames/frame_00.webp through frame_63.webp<br>' +
+      'Also check public/frames/center.webp';
+    return;
+  }
+
+  resizeCanvas();
+  ready = true;
+
+  const loading = document.getElementById('loading');
+  loading.style.opacity = '0';
+
+  setTimeout(() => loading.remove(), 700);
+  requestAnimationFrame(tick);
+}
+
+function resizeCanvas() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(scene.clientWidth * dpr);
+  canvas.height = Math.round(scene.clientHeight * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+addEventListener('resize', resizeCanvas);
+
+const TAU = Math.PI * 2;
+const norm = a => ((a % TAU) + TAU) % TAU;
+
+function lerpAngle(a, b, t) {
+  let d = norm(b - a);
+  if (d > Math.PI) d -= TAU;
+  return norm(a + d * t);
+}
+
+function drawCover(img) {
+  const w = scene.clientWidth;
+  const h = scene.clientHeight;
+  const s = Math.max(w / img.width, h / img.height);
+  const dw = img.width * s;
+  const dh = img.height * s;
+
+  // Parallax is applied to the scene container, not the eye
+  // direction calculation. This keeps eye tracking independent.
+  ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+}
+
+function tick() {
+  if (!ready) return;
+
+  const fx = innerWidth * FACE.x;
+  const fy = innerHeight * FACE.y;
+  const dx = mx - fx;
+  const dy = my - fy;
+  const dist = Math.hypot(dx, dy);
+ const target = norm(Math.atan2(dx, -dy));
+
+  angle = lerpAngle(angle, target, LERP);
+
+  ctx.fillStyle = getComputedStyle(document.documentElement)
+    .getPropertyValue('--bg');
+  ctx.fillRect(0, 0, scene.clientWidth, scene.clientHeight);
+
+ 
+  const idx = Math.round(angle / TAU * FRAME_COUNT) % FRAME_COUNT;
+
+   if (dist < Math.min(innerWidth, innerHeight) * DEADZONE) {
+   drawCover(center);
+   } else {
+   drawCover(frames[idx]);
+  }
+
+  requestAnimationFrame(tick);
+}
+
+// ======================================================
+// 2. POINTER STATE
+// ======================================================
+
+let mx = innerWidth / 2;
+let my = innerHeight / 2;
+
+let pointerInside = true;
+
+addEventListener('pointermove', e => {
+  mx = e.clientX;
+  my = e.clientY;
+  pointerInside = true;
+});
+
+addEventListener('pointerleave', () => {
+  pointerInside = false;
+});
+
+// ======================================================
+// 3. GLOWING CURSOR + TRAILING PARTICLES
+// ======================================================
+
+const dot = document.getElementById('dot');
+const ring = document.getElementById('ring');
+const trailCount = 8;
+const trails = [];
+
+for (let i = 0; i < trailCount; i++) {
+  const el = document.createElement('div');
+  el.className = 'trail';
+  document.body.appendChild(el);
+
+  trails.push({
+    el,
+    x: mx,
+    y: my,
+    factor: 0.32 - i * 0.027
+  });
+}
+
+let rx = mx;
+let ry = my;
+
+function cursorLoop() {
+  dot.style.transform = `translate3d(${mx}px,${my}px,0)`;
+
+  rx += (mx - rx) * 0.17;
+  ry += (my - ry) * 0.17;
+  ring.style.transform = `translate3d(${rx}px,${ry}px,0)`;
+
+  trails.forEach((trail, i) => {
+    trail.x += (mx - trail.x) * trail.factor;
+    trail.y += (my - trail.y) * trail.factor;
+
+    const size = 5 - i * 0.38;
+    const opacity = pointerInside ? 0.58 - i * 0.06 : 0;
+
+    trail.el.style.width = `${size}px`;
+    trail.el.style.height = `${size}px`;
+    trail.el.style.opacity = Math.max(0, opacity);
+    trail.el.style.transform =
+      `translate3d(${trail.x}px,${trail.y}px,0)`;
+  });
+
+  if (!pointerInside) {
+    dot.style.opacity = '0';
+    ring.style.opacity = '0';
+  } else {
+    dot.style.opacity = '1';
+    ring.style.opacity = '1';
+  }
+
+  requestAnimationFrame(cursorLoop);
+}
+
+cursorLoop();
+
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('pointerenter', () => ring.classList.add('hover'));
+  el.addEventListener('pointerleave', () => ring.classList.remove('hover'));
+});
+
+// ======================================================
+// 4. 3D-STYLE BACKGROUND PARALLAX
+// ======================================================
+
+let px = 0;
+let py = 0;
+let currentPX = 0;
+let currentPY = 0;
+
+addEventListener('pointermove', e => {
+  px = (e.clientX / innerWidth - 0.5) * 2;
+  py = (e.clientY / innerHeight - 0.5) * 2;
+});
+
+function parallaxLoop() {
+  currentPX += (px - currentPX) * 0.045;
+  currentPY += (py - currentPY) * 0.045;
+
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    scene.style.transform =
+      `translate3d(${-currentPX * 9}px,${-currentPY * 7}px,0) scale(1.015)`;
+  }
+
+  requestAnimationFrame(parallaxLoop);
+}
+
+parallaxLoop();
+
+// ======================================================
+// 5. MAGNETIC BUTTONS
+// ======================================================
+
+const canHover = matchMedia('(hover: hover) and (pointer: fine)');
+
+document.querySelectorAll('.magnetic').forEach(btn => {
+  btn.addEventListener('pointermove', e => {
+    if (!canHover.matches) return;
+
+    const r = btn.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width / 2);
+    const dy = e.clientY - (r.top + r.height / 2);
+
+    btn.style.setProperty('--mx', `${dx * 0.13}px`);
+    btn.style.setProperty('--my', `${dy * 0.18}px`);
+  });
+
+  btn.addEventListener('pointerleave', () => {
+    btn.style.setProperty('--mx', '0px');
+    btn.style.setProperty('--my', '0px');
+  });
+});
+
+// ======================================================
+// 6. CINEMATIC WORK / ABOUT / CONTACT PANELS
+// ======================================================
+
+const panels = [...document.querySelectorAll('.panel')];
+const hero = document.getElementById('hero');
+const navLinks = [...document.querySelectorAll('nav [data-panel]')];
+
+let activePanel = null;
+
+function openPanel(name) {
+  const panel = document.getElementById(name);
+  if (!panel) return;
+
+  activePanel = name;
+  hero.classList.add('leaving');
+
+  panels.forEach(p => {
+    const isActive = p === panel;
+    p.classList.toggle('open', isActive);
+    p.setAttribute('aria-hidden', String(!isActive));
+  });
+
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.dataset.panel === name);
+  });
+
+  history.replaceState(null, '', `#${name}`);
+}
+
+function closePanel() {
+  panels.forEach(p => {
+    p.classList.remove('open');
+    p.setAttribute('aria-hidden', 'true');
+  });
+
+  hero.classList.remove('leaving');
+  navLinks.forEach(link => link.classList.remove('active'));
+  activePanel = null;
+  history.replaceState(null, '', location.pathname + location.search);
+}
+
+document.querySelectorAll('[data-panel]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    openPanel(link.dataset.panel);
+  });
+});
+
+document.querySelectorAll('.close-btn').forEach(btn => {
+  btn.addEventListener('click', closePanel);
+});
+
+panels.forEach(panel => {
+  panel.addEventListener('click', e => {
+    if (e.target === panel) closePanel();
+  });
+});
+
+addEventListener('keydown', e => {
+  if (e.key === 'Escape' && activePanel) closePanel();
+});
+
+// Open a panel directly when its URL hash is used.
+const initialHash = location.hash.slice(1);
+if (['work', 'about', 'contact'].includes(initialHash)) {
+  openPanel(initialHash);
+}
+
+// ======================================================
+// 7. INTERACTIVE PROJECT CARD TILT
+// ======================================================
+
+document.querySelectorAll('.project').forEach(card => {
+  card.addEventListener('pointermove', e => {
+    if (!canHover.matches) return;
+
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;
+    const y = (e.clientY - r.top) / r.height;
+
+    const tiltY = (x - 0.5) * 9;
+    const tiltX = (0.5 - y) * 9;
+
+    card.style.setProperty('--px', `${tiltX}deg`);
+    card.style.setProperty('--py', `${tiltY}deg`);
+  });
+
+  card.addEventListener('pointerleave', () => {
+    card.style.setProperty('--px', '0deg');
+    card.style.setProperty('--py', '0deg');
+  });
+});
+
+// ======================================================
+// 8. RESUME BUTTON + SAFE PLACEHOLDERS
+// ======================================================
+
+const toast = document.getElementById('toast');
+let toastTimer;
+
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+
+
+// Tell the user when project/contact links have not been configured.
+document.querySelectorAll('a[href^="YOUR_"]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    showToast('Replace this placeholder with your real link.');
+  });
+});
+
+init();
+</script>
+</body>
+</html>
